@@ -51,8 +51,8 @@ class TileCollectionViewCell: UICollectionViewCell {
     func configureLabel() {
         contentView.addSubview(tileNumberLabel)
         tileNumberLabel.translatesAutoresizingMaskIntoConstraints = false
-        tileNumberLabel.font = UIFont.systemFont(ofSize: 30)
         tileNumberLabel.textAlignment = .center
+        tileNumberLabel.adjustsFontSizeToFitWidth = true
         tileNumberLabel.textColor = .black
         let constraints = [
             tileNumberLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),

@@ -7,15 +7,15 @@
 
 import Foundation
 
-protocol ViewModelDelegate: AnyObject {
+protocol GameViewModelDelegate: AnyObject {
     func updateGrid()
     func gameOver()
 }
 
-class ViewModel {
+class GameViewModel {
     var numberOfColumns: Int
     var gameMatrix: [[Int]]
-    weak var delegate: ViewModelDelegate?
+    weak var delegate: GameViewModelDelegate?
     
     init(numberOfColumns: Int) {
         self.numberOfColumns = numberOfColumns
@@ -68,7 +68,7 @@ class ViewModel {
         delegate?.updateGrid()
     }
     
-    func push(to direction: Bool, on line: Bool) { 
+    func push(to direction: Bool, on line: Bool) {
         // direction 0-backward, 1-forward, line: 0-horizontal, 1-vertical
         // right: 1, 0
         for column in 0..<numberOfColumns {

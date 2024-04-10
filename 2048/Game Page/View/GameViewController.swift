@@ -7,15 +7,26 @@
 
 import UIKit
 
-class ViewController: UIViewController {
-    private let numberOfColumns:CGFloat = 4
+class GameViewController: UIViewController {
+    private var numberOfColumns: CGFloat
     private lazy var tileMargin = round((UIScreen.main.bounds.width * 0.8) / numberOfColumns)
     private var gridCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-    private let viewModel = ViewModel(numberOfColumns: 4)
+    private let viewModel: GameViewModel
+    
+    init(boardSize: CGFloat = 4) {
+        numberOfColumns = boardSize
+        viewModel = GameViewModel(numberOfColumns: Int(boardSize))
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel.delegate = self
+        view.backgroundColor = UIColor(red: 250/255, green: 248/255, blue: 240/255, alpha: 1.0)
         configureCollectionView()
     }
     
@@ -45,7 +56,7 @@ class ViewController: UIViewController {
         let swipeLeftGesture = UISwipeGestureRecognizer(target: self, action: #selector(swipeLeftHandler(_:)))
         swipeLeftGesture.direction = UISwipeGestureRecognizer.Direction.left
         gridCollectionView.addGestureRecognizer(swipeLeftGesture)
-//        
+
         let swipeRightGesture = UISwipeGestureRecognizer(target: self, action: #selector(swipeRightHandler(_:)))
         swipeRightGesture.direction = UISwipeGestureRecognizer.Direction.right
         gridCollectionView.addGestureRecognizer(swipeRightGesture)
@@ -65,7 +76,7 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: UICollectionViewDelegateFlowLayout {
+extension GameViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: tileMargin, height: tileMargin)
     }
@@ -80,7 +91,7 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-extension ViewController: ViewModelDelegate {
+extension GameViewController: GameViewModelDelegate {
     func updateGrid() {
         gridCollectionView.reloadData()
     }
@@ -92,14 +103,14 @@ extension ViewController: ViewModelDelegate {
     
 }
 
-extension ViewController: UICollectionViewDataSource {
+extension GameViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return Int(numberOfColumns * numberOfColumns)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = gridCollectionView.dequeueReusableCell(withReuseIdentifier: TileCollectionViewCell.identifier, for: indexPath) as! TileCollectionViewCell
-        cell.tileNumber = viewModel.gameMatrix[indexPath.row / 4][indexPath.row % 4]
+        cell.tileNumber = viewModel.gameMatrix[indexPath.row / Int(numberOfColumns)][indexPath.row % Int(numberOfColumns)]
         return cell
     }
 }
