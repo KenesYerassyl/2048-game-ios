@@ -24,6 +24,12 @@ class GameViewModel {
         populateRandomly()
     }
     
+    func reset() {
+        self.gameMatrix = Array(repeating: Array(repeating: 0, count: numberOfColumns), count: numberOfColumns)
+        populateRandomly()
+        populateRandomly()
+    }
+    
     func checkValidity() -> Bool {
         for row in 0..<numberOfColumns {
             for column in 0..<numberOfColumns {

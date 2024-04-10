@@ -29,6 +29,7 @@ class HomeViewController: UIViewController {
         welcomeLabel.translatesAutoresizingMaskIntoConstraints = false
         welcomeLabel.sizeToFit()
         welcomeLabel.numberOfLines = 0
+        welcomeLabel.textColor = .black
         welcomeLabel.adjustsFontSizeToFitWidth = true
         welcomeLabel.textAlignment = .center
         welcomeLabel.font = UIFont.monospacedDigitSystemFont(ofSize: 24, weight: .black)
@@ -43,6 +44,7 @@ class HomeViewController: UIViewController {
     func configureTextField() {
         view.addSubview(textField)
         textField.placeholder = "4"
+        textField.textColor = .black
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.leftViewMode = .always
         textField.leftView = UIView(frame: CGRect(x:0,y:0,width:10,height:0))

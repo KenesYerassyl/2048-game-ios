@@ -12,6 +12,12 @@ class GameViewController: UIViewController {
     private lazy var tileMargin = round((UIScreen.main.bounds.width * 0.8) / numberOfColumns)
     private var gridCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private let viewModel: GameViewModel
+    private var scoreLabel = UILabel()
+    private var score = 0 {
+        didSet {
+            scoreLabel.text = "Current score: \(score)"
+        }
+    }
     
     init(boardSize: CGFloat = 4) {
         numberOfColumns = boardSize
@@ -28,9 +34,10 @@ class GameViewController: UIViewController {
         viewModel.delegate = self
         view.backgroundColor = UIColor(red: 250/255, green: 248/255, blue: 240/255, alpha: 1.0)
         configureCollectionView()
+        configureLabel()
     }
     
-    func configureCollectionView() {
+    private func configureCollectionView() {
         view.addSubview(gridCollectionView)
         gridCollectionView.delegate = self
         gridCollectionView.dataSource = self
@@ -62,16 +69,40 @@ class GameViewController: UIViewController {
         gridCollectionView.addGestureRecognizer(swipeRightGesture)
     }
     
-    @objc func swipeRightHandler(_ gesture: UISwipeGestureRecognizer) {
+    private func configureLabel() {
+        view.addSubview(scoreLabel)
+        scoreLabel.text = "Current score: 0"
+        scoreLabel.font = UIFont.systemFont(ofSize: 24)
+        scoreLabel.translatesAutoresizingMaskIntoConstraints = false
+        scoreLabel.textColor = .black
+        scoreLabel.textAlignment = .center
+        let constraints = [
+            scoreLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            scoreLabel.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width * 0.8),
+            scoreLabel.heightAnchor.constraint(equalToConstant: 50),
+            scoreLabel.bottomAnchor.constraint(equalTo: gridCollectionView.topAnchor, constant: -40)
+        ]
+        NSLayoutConstraint.activate(constraints)
+    }
+    
+    @objc private func resetGame() {
+        viewModel.reset()
+    }
+    
+    @objc private func swipeRightHandler(_ gesture: UISwipeGestureRecognizer) {
+        score += 1
         viewModel.push(to: true, on: false)
     }
-    @objc func swipeLeftHandler(_ gesture: UISwipeGestureRecognizer) {
+    @objc private func swipeLeftHandler(_ gesture: UISwipeGestureRecognizer) {
+        score += 1
         viewModel.push(to: false, on: false)
     }
-    @objc func swipeDownHandler(_ gesture: UISwipeGestureRecognizer) {
+    @objc private func swipeDownHandler(_ gesture: UISwipeGestureRecognizer) {
+        score += 1
         viewModel.push(to: true, on: true)
     }
-    @objc func swipeUpHandler(_ gesture: UISwipeGestureRecognizer) {
+    @objc private func swipeUpHandler(_ gesture: UISwipeGestureRecognizer) {
+        score += 1
         viewModel.push(to: false, on: true)
     }
 }
@@ -97,12 +128,14 @@ extension GameViewController: GameViewModelDelegate {
     }
     
     func gameOver() {
-        // TODO
+        let alert = UIAlertController(title: "You have lost :((", message: "Can't do any move", preferredStyle: .actionSheet)
+        let action = UIAlertAction(title: "Try again?", style: .cancel) { (_) in self.resetGame() }
+        alert.addAction(action)
+        self.present(alert, animated: true)
     }
     
     
 }
-
 extension GameViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return Int(numberOfColumns * numberOfColumns)
