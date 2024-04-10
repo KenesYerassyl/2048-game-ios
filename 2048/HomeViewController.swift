@@ -111,7 +111,6 @@ class HomeViewController: UIViewController {
         let boardSize = Int((textField.text ?? "4").trimmingCharacters(in: .whitespacesAndNewlines)) ?? 4
         if (2 < boardSize && boardSize < 13) {
             navigationController?.pushViewController(GameViewController(boardSize: CGFloat(boardSize)), animated: true)
-            print("ASDASD")
         } else {
             warningLabel.isHidden = false
         }

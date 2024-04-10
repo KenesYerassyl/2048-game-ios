@@ -31,7 +31,7 @@ class TileCollectionViewCell: UICollectionViewCell {
         65536: "#F58634",
         131072: "#F57336"
     ]
-
+    
     private var tileNumberLabel = UILabel()
     
     public var tileNumber: Int = 0 {

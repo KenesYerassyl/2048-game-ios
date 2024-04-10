@@ -63,7 +63,7 @@ class GameViewController: UIViewController {
         let swipeLeftGesture = UISwipeGestureRecognizer(target: self, action: #selector(swipeLeftHandler(_:)))
         swipeLeftGesture.direction = UISwipeGestureRecognizer.Direction.left
         gridCollectionView.addGestureRecognizer(swipeLeftGesture)
-
+        
         let swipeRightGesture = UISwipeGestureRecognizer(target: self, action: #selector(swipeRightHandler(_:)))
         swipeRightGesture.direction = UISwipeGestureRecognizer.Direction.right
         gridCollectionView.addGestureRecognizer(swipeRightGesture)
@@ -91,19 +91,19 @@ class GameViewController: UIViewController {
     
     @objc private func swipeRightHandler(_ gesture: UISwipeGestureRecognizer) {
         score += 1
-        viewModel.push(to: true, on: false)
+        viewModel.modifyGameMatrix(.right)
     }
     @objc private func swipeLeftHandler(_ gesture: UISwipeGestureRecognizer) {
         score += 1
-        viewModel.push(to: false, on: false)
+        viewModel.modifyGameMatrix(.left)
     }
     @objc private func swipeDownHandler(_ gesture: UISwipeGestureRecognizer) {
         score += 1
-        viewModel.push(to: true, on: true)
+        viewModel.modifyGameMatrix(.down)
     }
     @objc private func swipeUpHandler(_ gesture: UISwipeGestureRecognizer) {
         score += 1
-        viewModel.push(to: false, on: true)
+        viewModel.modifyGameMatrix(.up)
     }
 }
 

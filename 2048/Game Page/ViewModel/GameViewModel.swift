@@ -7,6 +7,27 @@
 
 import Foundation
 
+enum Direction {
+    case left
+    case right
+    case up
+    case down
+    
+    func values() -> (x: Int, y: Int){
+        switch self {
+        case .left:
+            return (0, -1)
+        case .right:
+            return (0, 1)
+        case .up:
+            return (-1, 0)
+        case .down:
+            return (1, 0)
+        }
+    }
+}
+
+
 protocol GameViewModelDelegate: AnyObject {
     func updateGrid()
     func gameOver()
@@ -30,22 +51,22 @@ class GameViewModel {
         populateRandomly()
     }
     
-    func checkValidity() -> Bool {
+    private func checkAdjacentTiles(_ row: Int, _ col: Int) -> Bool {
+        let adjacentTiles = [(row + 1, col), (row - 1, col), (row, col + 1), (row, col - 1)]
+        for (adjRow, adjCol) in adjacentTiles {
+            if adjRow >= 0 && adjRow < numberOfColumns && adjCol >= 0 && adjCol < numberOfColumns {
+                if gameMatrix[adjRow][adjCol] == gameMatrix[row][col] {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    
+    func isPlayable() -> Bool {
         for row in 0..<numberOfColumns {
-            for column in 0..<numberOfColumns {
-                if (gameMatrix[row][column] == 0) {
-                    return true;
-                }
-                if (row + 1 < numberOfColumns && gameMatrix[row + 1][column] == gameMatrix[row][column]) {
-                    return true
-                }
-                if (row - 1 >= 0 && gameMatrix[row - 1][column] == gameMatrix[row][column]) {
-                    return true
-                }
-                if (column + 1 < numberOfColumns && gameMatrix[row][column + 1] == gameMatrix[row][column]) {
-                    return true
-                }
-                if (column - 1 >= 0 && gameMatrix[row][column - 1] == gameMatrix[row][column]) {
+            for col in 0..<numberOfColumns {
+                if (checkAdjacentTiles(row, col) == true) {
                     return true
                 }
             }
@@ -55,7 +76,7 @@ class GameViewModel {
     
     func populateRandomly() {
         
-        if (checkValidity() == false) {
+        if (isPlayable() == false) {
             delegate?.gameOver()
         }
         
@@ -74,42 +95,44 @@ class GameViewModel {
         delegate?.updateGrid()
     }
     
-    func push(to direction: Bool, on line: Bool) {
-        // direction 0-backward, 1-forward, line: 0-horizontal, 1-vertical
-        // right: 1, 0
-        for column in 0..<numberOfColumns {
-            var newArray: [Int] = []
-            var isMergable: Bool = true
-            for row in stride(
-                from: (direction == true ? numberOfColumns - 1 : 0),
-                through: (direction == true ? 0 : numberOfColumns - 1),
-                by: (direction == true ? -1 : 1)) {
-                let element = line == true ? gameMatrix[row][column] : gameMatrix[column][row]
-                if (element == 0) {
-                    continue
-                }
-                if (newArray.isEmpty == false && newArray.last == element && isMergable == true) {
-                    newArray[newArray.count - 1] += element
+    func modifyGameMatrix(_ direction: Direction) {
+        let flag = direction == .down || direction == .up ? true : false
+        for val in 0..<numberOfColumns {
+            getModifiedRowOrColumn(val, flag, direction)
+        }
+        populateRandomly()
+    }
+    private func getModifiedRowOrColumn(_ val: Int, _ flag: Bool, _ direction: Direction) {
+        // 0 -> row, 1 -> column
+        var newArray: [Int] = []
+        var isMergable: Bool = true
+        var row = flag == false ? val : direction == .down ? 0 : numberOfColumns-1
+        var col = flag == true ? val : direction == .right ? 0 : numberOfColumns-1
+        while ((0..<numberOfColumns).contains(row) && (0..<numberOfColumns).contains(col)) {
+            if (gameMatrix[row][col] != 0) {
+                if (newArray.isEmpty == false && newArray.last == gameMatrix[row][col] && isMergable == true) {
+                    newArray[newArray.count - 1] += gameMatrix[row][col]
                     isMergable = false
                 } else {
-                    newArray.append(element)
+                    newArray.append(gameMatrix[row][col])
                     isMergable = true
                 }
             }
-            while (newArray.count < numberOfColumns) {
-                newArray.append(0)
-            }
-            if (direction == true) {
-                newArray.reverse()
-            }
-            for row in 0..<numberOfColumns {
-                if (line == true) {
-                    gameMatrix[row][column] = newArray[row]
-                } else {
-                    gameMatrix[column][row] = newArray[row]
-                }
+            row += direction.values().x
+            col += direction.values().y
+        }
+        while (newArray.count < numberOfColumns) {
+            newArray.append(0)
+        }
+        if (direction == .right || direction == .down) {
+            newArray.reverse()
+        }
+        for index in 0..<numberOfColumns {
+            if (flag == true) {
+                gameMatrix[index][val] = newArray[index]
+            } else {
+                gameMatrix[val][index] = newArray[index]
             }
         }
-        populateRandomly()
     }
 }
